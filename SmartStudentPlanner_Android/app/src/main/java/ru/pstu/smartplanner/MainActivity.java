@@ -1,7 +1,9 @@
 package ru.pstu.smartplanner;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,40 +13,54 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView tvResult;
+    private EditText etIdentifier, etPassword;
+    private TextView tvStatus;
+    private Button btnLogin, btnGoToRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login); // Привязка к экрану входа
 
-        tvResult = findViewById(R.id.tvResult);
-        Button btnTest = findViewById(R.id.btnTest);
+        etIdentifier = findViewById(R.id.etIdentifier);
+        etPassword = findViewById(R.id.etPassword);
+        tvStatus = findViewById(R.id.tvStatus);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnGoToRegister = findViewById(R.id.btnGoToRegister);
 
-        btnTest.setOnClickListener(v -> {
-            tvResult.setText("Отправка запроса...");
+        btnLogin.setOnClickListener(v -> {
+            String identifier = etIdentifier.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-            RegisterRequest reg = new RegisterRequest(
-                    "olga_test_" + System.currentTimeMillis() % 10000,
-                    "olga" + System.currentTimeMillis() % 10000 + "@test.com",
-                    "password123"
-            );
+            if (identifier.isEmpty() || password.isEmpty()) {
+                tvStatus.setText("Заполните все поля");
+                return;
+            }
 
-            ApiClient.getApi().register(reg).enqueue(new Callback<UserResponse>() {
+            tvStatus.setText("Вход...");
+            LoginRequest request = new LoginRequest(identifier, password);
+
+            ApiClient.getApi().login(request).enqueue(new Callback<TokenResponse>() {
                 @Override
-                public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
-                    if (response.isSuccessful()) {
-                        tvResult.setText("Регистрация OK: " + response.body().username);
+                public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        tvStatus.setText("Успешный вход! Токен получен.");
+                        // Здесь потом можно сохранить токен в SharedPreferences
                     } else {
-                        tvResult.setText("Ошибка регистрации: " + response.code());
+                        tvStatus.setText("Ошибка входа: " + response.code());
                     }
                 }
 
                 @Override
-                public void onFailure(Call<UserResponse> call, Throwable t) {
-                    tvResult.setText("Сеть недоступна: " + t.getMessage());
+                public void onFailure(Call<TokenResponse> call, Throwable t) {
+                    tvStatus.setText("Сеть недоступна: " + t.getMessage());
                 }
             });
+        });
+
+        btnGoToRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
     }
 }
