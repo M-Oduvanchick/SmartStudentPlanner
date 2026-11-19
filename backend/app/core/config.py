@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     )
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = Field(default=60, gt=0)
+    pnrpu_base_url: str = "https://pstu.ru"
+    pnrpu_schedule_path: str = "/student/schedule/"
+    pnrpu_request_timeout_seconds: float = Field(default=20, gt=0)
+    pnrpu_max_schedule_file_size_bytes: int = Field(default=10 * 1024 * 1024, gt=0)
 
     model_config = SettingsConfigDict(
         env_file=".env",
