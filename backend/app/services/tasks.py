@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.task import Task
 from app.repositories.tasks import TaskRepository
-from app.schemas.task import TaskCreate, TaskPriority, TaskUpdate
+from app.schemas.common import Priority
+from app.schemas.task import TaskCreate, TaskUpdate
 
 
 class TaskNotFoundError(Exception):
@@ -40,7 +41,7 @@ class TaskService:
     async def update(self, task_id: UUID, user_id: UUID, data: TaskUpdate) -> Task:
         task = await self.get(task_id, user_id)
         changes = data.model_dump(exclude_unset=True)
-        if isinstance(changes.get("priority"), TaskPriority):
+        if isinstance(changes.get("priority"), Priority):
             changes["priority"] = changes["priority"].value
         task = await self.tasks.update(task, changes)
         await self.session.commit()

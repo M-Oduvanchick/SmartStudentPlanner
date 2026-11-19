@@ -1,14 +1,9 @@
 from datetime import datetime
-from enum import Enum
 from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator
 
-
-class TaskPriority(str, Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
+from app.schemas.common import Priority
 
 
 class TaskCreate(BaseModel):
@@ -16,7 +11,7 @@ class TaskCreate(BaseModel):
     description: str | None = Field(default=None, max_length=5000)
     due_at: AwareDatetime
     reminder_at: AwareDatetime | None = None
-    priority: TaskPriority = TaskPriority.MEDIUM
+    priority: Priority = Priority.MEDIUM
 
     @field_validator("title", mode="before")
     @classmethod
@@ -29,7 +24,7 @@ class TaskUpdate(BaseModel):
     description: str | None = Field(default=None, max_length=5000)
     due_at: AwareDatetime | None = None
     reminder_at: AwareDatetime | None = None
-    priority: TaskPriority | None = None
+    priority: Priority | None = None
     is_completed: bool | None = None
 
     @field_validator("title", mode="before")
@@ -52,7 +47,7 @@ class TaskResponse(BaseModel):
     description: str | None
     due_at: datetime
     reminder_at: datetime | None
-    priority: TaskPriority
+    priority: Priority
     is_completed: bool
     created_at: datetime
     updated_at: datetime
