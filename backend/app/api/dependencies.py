@@ -1,3 +1,4 @@
+from collections.abc import AsyncIterator
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -6,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import decode_access_token
 from app.db.session import get_db
+from app.integrations.pnrpu import PnrpuScheduleClient
 from app.models.user import User
 from app.repositories.users import UserRepository
 
@@ -41,3 +43,11 @@ async def get_current_user(
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+async def get_pnrpu_schedule_client() -> AsyncIterator[PnrpuScheduleClient]:
+    async with PnrpuScheduleClient() as client:
+        yield client
+
+
+PnrpuClient = Annotated[PnrpuScheduleClient, Depends(get_pnrpu_schedule_client)]

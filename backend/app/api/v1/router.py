@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import auth, homeworks, notes, tasks, users
+from app.api.v1 import auth, homeworks, notes, schedules, tasks, users
 
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(auth.router)
@@ -8,3 +8,4 @@ api_router.include_router(users.router)
 api_router.include_router(tasks.router)
 api_router.include_router(homeworks.router)
 api_router.include_router(notes.router)
+api_router.include_router(schedules.router)

@@ -8,6 +8,7 @@ class UserResponse(BaseModel):
     id: UUID
     username: str
     email: EmailStr
+    schedule_id: UUID | None
     created_at: datetime
     updated_at: datetime
 
